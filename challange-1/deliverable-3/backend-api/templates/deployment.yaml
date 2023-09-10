@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.metadata.appname }}
+  namespace: {{ .Values.metadata.namespace }}
+  # annotations:
+  #   reloader.stakater.com/auto: "true"
+  labels:
+    app: {{ .Values.metadata.appname }}
+spec:
+  replicas: {{ .Values.replicasCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.metadata.appname }}
+
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.metadata.appname }}
+    spec:
+      imagePullSecrets:
+        - name: {{ .Values.image.imagePullSecrets }}
+      hostAliases:
+      {{- range $ip, $hostnames := .Values.hostAliases }}
+        - ip: {{ $ip | quote }}
+          hostnames:
+            - {{ $hostnames | quote }}
+      {{- end}}
+      containers:
+        - image: {{ .Values.image.registry }}/{{ .Values.image.repo }}/{{ .Values.image.name }}:{{ .Values.image.tag }}
+          name: {{ .Values.metadata.appname }}
+          ports:
+            - containerPort: {{ .Values.port }}
+              name: http
+              protocol: tcp
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.metadata.appname }}-cm
+            - secretRef:
+                name: {{ .Values.metadata.appname }}-envs
+          # livenessProbe:
+          #   httpGet:
+          #     path: /1.0/_health
+          #     port: 3005
+          #   initialDelaySeconds: 30
+          #   periodSeconds: 3
+          resources: {}

@@ -1,0 +1,35 @@
+metadata:
+  appname: backend-api
+  namespace: prod
+replicasCount: 2
+port: 3005
+hostAliases:
+  - ip: "4.4.4.4"
+    hostnames:
+      - "mongodb01"
+  - ip: "5.5.5.5"
+    hostnames:
+      - "mongodb-2"
+  - ip: "6.6.6.6"
+    hostnames:
+      - "mongodb-3"
+image:
+  registry: https://gchr.io
+  repo: prod
+  name: backend-api
+  tag: 1.0.4
+  imagePullSecrets: ghcr-prod-secret
+service:
+  - name: 
+    port: 
+    targetPort: 
+    protocol: TCP
+env:
+  configs:
+    PORT: 3005
+    key1: value1
+    key2: value2
+  secrets:
+    key1: value1
+    key2: value2
+secretsType: Opaque
